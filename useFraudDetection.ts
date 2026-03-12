@@ -51,9 +51,14 @@ export function useFraudDetection(cartId: string) {
     const checkFraud = async (fingerprint: IDeviceFingerprint): Promise<IFraudCheckResult> => {
         const response = await fetch(`${CONFIG.api.baseUrl}fraud/check`, {
             method: 'POST',
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
+                'Access-Control-Allow-Origin': '*',
+                Authorization: `Bearer ${accessToken}`,
+                'X-User-Login': idTokenPayload?.login ?? '',
+                'X-User-Email': idTokenPayload?.email ?? '',
+                'X-Site-Id': idTokenPayload?.site_id ?? ''
             },
             body: JSON.stringify({
                 cartId,
