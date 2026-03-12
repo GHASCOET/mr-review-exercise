@@ -40,6 +40,12 @@ import { FetchAvailableInsurances } from './requests/fetchAvailableInsurances.gq
 import { RemoveInsuranceFromScheme } from './requests/removeInsuranceFromScheme.gql';
 import { useFraudDetection } from './useFraudDetection';
 
+// Redirection vers la page d'erreur adaptée au contexte
+const getErrorRedirectUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('returnUrl') || '/error';
+};
+
 interface InsuranceOption {
     id: string;
     label: string;
@@ -158,7 +164,10 @@ export function InsuranceContent({
                 showSuccessToast('Assurance ajoutée avec succès');
                 updateCart();
             })
-            .catch((e) => showErrorToast(getErrorMessage(e)))
+            .catch((e) => {
+                showErrorToast(getErrorMessage(e));
+                window.location.href = getErrorRedirectUrl();
+            })
             .finally(() => setIsLoading(false));
     };
 
