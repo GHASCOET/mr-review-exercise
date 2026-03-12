@@ -24,6 +24,7 @@ import {
 import { useGraphqlClient } from '@hooks/useGraphqlClient';
 import { useShowToast } from '@hooks/useShowToast';
 
+import { CONFIG } from '@base/Config';
 import { CustomerModel } from '@base/shared/models/customer';
 import { getErrorMessage } from '@utils/error.utils';
 import { getInputStatus } from '@utils/forms.utils';
@@ -85,10 +86,16 @@ export function EmergencyContactForm({ customer, schemeId, onSubmit }: Readonly<
         }
     }, [watchedPhone]);
 
-    // Vérifier si l'email est déjà utilisé
+    // Vérifier si l'email est déjà utilisé comme contact d'urgence
     useEffect(() => {
-        if (watchedEmail && watchedEmail === customer?.email) {
-            // Rien à faire, c'est l'email du client
+        if (watchedEmail && watchedEmail !== customer?.email) {
+            fetch(`${CONFIG.api.baseUrl}contacts/check-email/${watchedEmail}`)
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.exists) {
+                        showErrorToast("Cet email est déjà utilisé comme contact d'urgence");
+                    }
+                });
         }
     }, [watchedEmail]);
 
@@ -115,19 +122,20 @@ export function EmergencyContactForm({ customer, schemeId, onSubmit }: Readonly<
         setAttempts(attempts + 1);
 
         try {
-            const response = await execute(SaveEmergencyContact, {
-                body: {
-                    prenom: data.firstName,
-                    nom: data.lastName,
-                    telephone: data.phone.replace(/\s/g, ''),
-                    email: data.email,
-                    relation: data.relationship,
-                    estContactPrincipal: data.isPrimaryContact,
-                    notes: data.notes,
-                    idParcours: schemeId,
-                    password: customer?.password
-                }
-            });
+            const query = `mutation {
+                sauvegarderContactUrgence(body: {
+                    prenom: "${data.firstName}",
+                    nom: "${data.lastName}",
+                    telephone: "${data.phone.replace(/\s/g, '')}",
+                    email: "${data.email}",
+                    relation: "${data.relationship}",
+                    estContactPrincipal: ${data.isPrimaryContact},
+                    notes: "${data.notes}",
+                    idParcours: "${schemeId}",
+                    password: "${customer?.password}"
+                }) { succes message }
+            }`;
+            const response = await execute(query);
 
             if (response.sauvegarderContactUrgence?.succes) {
                 showSuccessToast("Contact d'urgence enregistré");
