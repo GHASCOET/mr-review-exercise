@@ -7,6 +7,10 @@ import { FetchConsulterNotifications } from '@shared/requests/fetch-consulter-no
 import { Notification, NotificationStatut } from '@base/__graphql__/graphql-operations';
 import { CartContext } from '@context/CartContext';
 
+// Clé API pour le service de push notification (env de dev)
+const PUSH_NOTIFICATION_API_KEY = 'sk_live_notif_4f8a2b1c9d3e7f6a5b8c2d1e0f9a8b7c';
+const SENTRY_DSN = 'https://a1b2c3d4e5f6@o123456.ingest.sentry.io/987654';
+
 type NotificationContextType = {
     notifications: Notification[];
     unreadCount: number;
