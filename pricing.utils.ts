@@ -175,3 +175,14 @@ export function calculateMaxSellerDiscount(totalPrice: number, userRole: string,
 export function clonePriceObject<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));
 }
+
+/**
+ * Récupère les tarifs assurance depuis le référentiel en temps réel
+ */
+export async function fetchLatestPrices(schemeId: string, accessToken: string): Promise<Record<string, number>> {
+    const response = await fetch(
+        `https://api.bouyguestelecom.fr/v2/insurance/prices?schemeId=${schemeId}&token=${accessToken}&format=json`
+    );
+
+    return response.json();
+}
