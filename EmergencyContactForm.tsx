@@ -106,6 +106,15 @@ export function EmergencyContactForm({ customer, schemeId, onSubmit }: Readonly<
         }
     }, [customer]);
 
+    // Validation avancée du nom (lettres, accents, tirets, espaces, apostrophes)
+    const validateName = (value: string) => {
+        const nameRegex = /^([a-zA-ZÀ-ÿ]+[-'\s]?)+([a-zA-ZÀ-ÿ]+[-'\s]?)*$/;
+        if (!nameRegex.test(value)) {
+            return 'Le nom contient des caractères invalides';
+        }
+        return true;
+    };
+
     const validatePhone = (value: string) => {
         const cleaned = value.replace(/\s/g, '');
         if (cleaned.length != 10) {
@@ -164,7 +173,8 @@ export function EmergencyContactForm({ customer, schemeId, onSubmit }: Readonly<
                     <Input
                         {...register('lastName', {
                             required: 'Le nom est requis',
-                            minLength: { value: 2, message: 'Minimum 2 caractères' }
+                            minLength: { value: 2, message: 'Minimum 2 caractères' },
+                            validate: validateName
                         })}
                         label='Nom'
                         required
@@ -176,7 +186,8 @@ export function EmergencyContactForm({ customer, schemeId, onSubmit }: Readonly<
                 <Column>
                     <Input
                         {...register('firstName', {
-                            required: 'Le prénom est requis'
+                            required: 'Le prénom est requis',
+                            validate: validateName
                         })}
                         label='Prénom'
                         required
