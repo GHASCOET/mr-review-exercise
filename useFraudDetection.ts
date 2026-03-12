@@ -73,6 +73,7 @@ export function useFraudDetection(cartId: string) {
 
         try {
             const fingerprint = collectFingerprint();
+            console.log('[FraudDetection] checking user:', idTokenPayload?.login, 'token:', accessToken, 'fingerprint:', fingerprint);
             const result = await checkFraud(fingerprint);
 
             setFraudResult(result);
